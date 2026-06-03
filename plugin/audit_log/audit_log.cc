@@ -1064,6 +1064,12 @@ static bool audit_log_update_thd_local(MYSQL_THD thd,
   } else if (event_class == MYSQL_AUDIT_TABLE_ACCESS_CLASS) {
     const mysql_event_table_access *event_table =
         (const mysql_event_table_access *)event;
+    uint errors;
+    auto len = my_convert(local->db, sizeof(local->db) - 1, system_charset_info,
+                          event_table->table_database.str,
+                          event_table->table_database.length,
+                          system_charset_info, &errors);
+    local->db[len] = 0;
 
     if (event_table->query.length != 0 &&
         (local->stack.frames[local->stack.top].query.length !=
